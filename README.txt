@@ -1,0 +1,1 @@
+El proyecto esta hecho a modo de ejemplo, no esta completo y no esta separado en capas como lo hubiese planteado, recién vi el proyecto de disney, estaba haciendo el de la universidad, sin nada más, saludos.
