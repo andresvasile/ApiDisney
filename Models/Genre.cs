@@ -10,6 +10,6 @@ namespace ApiDisney.Models
         public int Id_Genre { get; set; }
         public string Name { get; set; }
         public string Image { get; set; }
-        public ICollection<Movie> Movies { get; set; }
+        public virtual ICollection<Movie> Movies { get; set; }
     }
 }

@@ -10,6 +10,6 @@ namespace ApiDisney.Models
         public double Weight{ get; set; }
         public string History { get; set; }
         public string Image { get; set; }
-        public ICollection<CharacterMovie> CharacterMovies { get; set; }
+        public virtual ICollection<CharacterMovie> CharacterMovies { get; set; }
     }
 }

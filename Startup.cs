@@ -29,7 +29,12 @@ namespace ApiDisney
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddDbContext<AppDbContext>(o=>o.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<AppDbContext>(o =>
+            {
+                o.UseLazyLoadingProxies();
+                o.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+            });
+                
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ApiDisney", Version = "v1" });

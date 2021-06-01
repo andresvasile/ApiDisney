@@ -33,7 +33,7 @@ namespace ApiDisney.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Character>> CreateCharacter(CharacterDto characterDto)
+        public async Task<ActionResult<CharacterDto>> CreateCharacter(CharacterDto characterDto)
         {
             var spec = new ExistingCharacterByNameSpecification(characterDto.Name);
 
@@ -52,12 +52,12 @@ namespace ApiDisney.Controllers
 
             if (result <= 0) return null;
 
-            return character;
+            return characterDto;
 
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Character>> UpdateCharacter(int id, [FromBody] CharacterDto characterDto)
+        public async Task<ActionResult<CharacterDto>> UpdateCharacter(int id, [FromBody] CharacterDto characterDto)
         {
             var spec = new ExistingCharacterByIdSpecification(id);
 
@@ -78,7 +78,9 @@ namespace ApiDisney.Controllers
 
             if (result <= 0) return null;
 
-            return character;
+            var characterDtoToReturn = _mapper.Map<Character, CharacterDto>(character);
+
+            return characterDtoToReturn;
         }
 
         [HttpDelete("{id}")]
