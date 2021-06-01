@@ -138,5 +138,24 @@ namespace ApiDisney.Controllers
 
             return BadRequest(new ApiResponse(400, "No puede ser negativa la edad"));
         }
+
+        [HttpGet("movies/{idMovie}")]
+        public async Task<ActionResult<IReadOnlyList<CharacterDto>>> GetCharacterByMovie(int idMovie)
+        {
+            if (idMovie > 0)
+            {
+                var spec = new FilterCharactersByMovieSpecification(idMovie);
+                var charactersWithIdMovieSpecific = await _unitOfWork.Repository<Character>().ListAsync(spec);
+
+                if (charactersWithIdMovieSpecific.Count>0)
+                {
+                    return _mapper.Map<List<Character>, List<CharacterDto>>(charactersWithIdMovieSpecific.ToList());
+                }
+                return Ok("No se encontraron resultados con ese identificador");
+
+            }
+
+            return BadRequest(new ApiResponse(400, "El identificador de pelicula no puede ser negativo"));
+        }
     }
 }
