@@ -12,7 +12,10 @@ using Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using ApiDisney.Extensions;
 using ApiDisney.Helpers;
+using ApiDisney.Identity;
+using Services;
 
 namespace ApiDisney
 {
@@ -34,12 +37,19 @@ namespace ApiDisney
                 o.UseLazyLoadingProxies();
                 o.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
-                
+
+            services.AddDbContext<AppIdentityDbContext>(x =>
+            {
+                x.UseSqlServer(Configuration.GetConnectionString("IdentityConnection"));
+            });
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ApiDisney", Version = "v1" });
             });
             services.AddAutoMapper(typeof(MappingProfile));
+            services.AddIdentityServices(Configuration);
+
+            services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<>), (typeof(GenericRepository<>)));
             services.Configure<ApiBehaviorOptions>(options =>
@@ -79,6 +89,7 @@ namespace ApiDisney
             app.UseRouting();
 
             app.UseAuthorization();
+            app.UseAuthentication();
 
             app.UseEndpoints(endpoints =>
             {

@@ -56,6 +56,23 @@ namespace ApiDisney.Controllers
 
         }
 
+        [HttpGet("details/{idCharacter}")]
+        public async Task<ActionResult<CharacterDto>> DetailsCharacter(int idCharacter)
+        {
+            var characterValidate = await _unitOfWork.Repository<Character>().GetByIdAsync(idCharacter);
+
+            if (characterValidate == null)
+            {
+                return BadRequest(new ApiResponse(400, "Character don't exists"));
+            }
+
+            var characterDto = _mapper.Map<Character, CharacterDto>(characterValidate);
+
+            return characterDto;
+
+        }
+
+
         [HttpPut("{id}")]
         public async Task<ActionResult<CharacterDto>> UpdateCharacter(int id, [FromBody] CharacterDto characterDto)
         {
@@ -66,6 +83,15 @@ namespace ApiDisney.Controllers
             if (character == null)
             {
                 return BadRequest(new ApiResponse(404, "Character not found"));
+            }
+
+            var specName = new ExistingCharacterByNameSpecification(characterDto.Name);
+
+            var characterVlidate = await _unitOfWork.Repository<Character>().GetEntityWithSpec(specName);
+
+            if (characterVlidate != null && character.Id_Character != characterVlidate.Id_Character)
+            {
+                return BadRequest(new ApiResponse(400, "Character name already exists"));
             }
 
             character.Name = characterDto.Name ?? character.Name;
