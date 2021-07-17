@@ -1,1 +1,3 @@
-El proyecto esta hecho a modo de ejemplo, no esta completo y no esta separado en capas como lo hubiese planteado, recién vi el proyecto de disney, estaba haciendo el de la universidad, sin nada más, saludos.
+Para ejecutar el proyecto utilizar el comando en la terminal de visual studio code:
+
+dotnet watch run
