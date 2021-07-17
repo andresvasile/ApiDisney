@@ -11,7 +11,7 @@ namespace ApiDisney.Models
         public string Image{ get; set; }
         public string Title { get; set; }
         public DateTime CreatedAt{ get; set; }
-        public Rating Rating { get; set; }
+        public Rating? Rating { get; set; }
         public virtual ICollection<CharacterMovie> CharacterMovies { get; set; }
     }
 }

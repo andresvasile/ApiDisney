@@ -14,5 +14,6 @@ namespace ApiDisney.Dto
         public double Weight { get; set; }
         public string History { get; set; }
         public string Image { get; set; }
+        //public ICollection<CharacterMovieDto> CharacterMovies { get; set; }
     }
 }

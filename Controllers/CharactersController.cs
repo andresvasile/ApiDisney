@@ -1,22 +1,20 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using ApiDisney.Dto;
+﻿using ApiDisney.Dto;
 using ApiDisney.Errors;
 using ApiDisney.Models;
 using AutoMapper;
 using Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Specifications;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ApiDisney.Controllers
 {
     public class CharactersController : BaseApiController
     {
-        public IUnitOfWork _unitOfWork { get; set; }
-        public IMapper _mapper{ get; set; }
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
         public CharactersController(IUnitOfWork unitOfWork, IMapper mapper)
         {
@@ -25,11 +23,11 @@ namespace ApiDisney.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<CharacterDto>>> GetCharacters()
+        public async Task<ActionResult<IReadOnlyList<CharacterSpecificDto>>> GetCharacters()
         {
-            var characters= await _unitOfWork.Repository<Character>().ListAllAsync();
+            var characters = await _unitOfWork.Repository<Character>().ListAllAsync();
 
-            return _mapper.Map<List<Character>, List<CharacterDto>>(characters.ToList());
+            return _mapper.Map<List<Character>, List<CharacterSpecificDto>>(characters.ToList());
         }
 
         [HttpPost]
@@ -52,22 +50,7 @@ namespace ApiDisney.Controllers
 
             if (result <= 0) return null;
 
-            return characterDto;
-
-        }
-
-        [HttpGet("details/{idCharacter}")]
-        public async Task<ActionResult<CharacterDto>> DetailsCharacter(int idCharacter)
-        {
-            var characterValidate = await _unitOfWork.Repository<Character>().GetByIdAsync(idCharacter);
-
-            if (characterValidate == null)
-            {
-                return BadRequest(new ApiResponse(400, "Character don't exists"));
-            }
-
-            var characterDto = _mapper.Map<Character, CharacterDto>(characterValidate);
-
+            characterDto.Id_Character = character.Id_Character;
             return characterDto;
 
         }
@@ -96,7 +79,7 @@ namespace ApiDisney.Controllers
 
             character.Name = characterDto.Name ?? character.Name;
             character.Age = characterDto.Age < 0 ? character.Age : characterDto.Age;
-            character.Weight = characterDto.Weight <0 ? character.Weight : characterDto.Weight;
+            character.Weight = characterDto.Weight < 0 ? character.Weight : characterDto.Weight;
             character.History = characterDto.History ?? character.History;
             character.Image = characterDto.Image ?? character.Image;
 
@@ -129,10 +112,27 @@ namespace ApiDisney.Controllers
             return Ok($" Character {character.Name} was deleted");
         }
 
+
+        [HttpGet("details/{idCharacter}")]
+        public async Task<ActionResult<CharacterDto>> DetailsCharacter(int idCharacter)
+        {
+            var characterValidate = await _unitOfWork.Repository<Character>().GetByIdAsync(idCharacter);
+
+            if (characterValidate == null)
+            {
+                return BadRequest(new ApiResponse(400, "Character don't exists"));
+            }
+
+            var characterDto = _mapper.Map<Character, CharacterDto>(characterValidate);
+
+            return characterDto;
+
+        }
+
         [HttpGet("name/{name}")]
         public async Task<ActionResult<IReadOnlyList<CharacterDto>>> GetCharacterByNombre(string name)
         {
-            if(!string.IsNullOrEmpty(name))
+            if (!string.IsNullOrEmpty(name))
             {
                 var spec = new FilterCharacterByNameSpecification(name);
                 var charactersWithNameSpecific = await _unitOfWork.Repository<Character>().ListAsync(spec);
@@ -149,16 +149,16 @@ namespace ApiDisney.Controllers
         }
 
         [HttpGet("age/{age}")]
-        public async Task<ActionResult<CharacterDto>> GetCharacterByAge(int age)
+        public async Task<ActionResult<IReadOnlyList<CharacterDto>>> GetCharacterByAge(int age)
         {
             if (age > 0)
             {
                 var spec = new FilterCharacterByAgeSpecification(age);
-                var charactersWithAgeSpecific = await _unitOfWork.Repository<Character>().GetEntityWithSpec(spec);
+                var charactersWithAgeSpecific = await _unitOfWork.Repository<Character>().ListAsync(spec);
 
-                if (charactersWithAgeSpecific != null)
+                if (charactersWithAgeSpecific.Count > 0)
                 {
-                    return _mapper.Map<Character, CharacterDto>(charactersWithAgeSpecific);
+                    return _mapper.Map<List<Character>, List<CharacterDto>>(charactersWithAgeSpecific.ToList());
                 }
                 return Ok("No se encontraron resultados con esa edad");
 
@@ -175,7 +175,7 @@ namespace ApiDisney.Controllers
                 var spec = new FilterCharactersByMovieSpecification(idMovie);
                 var charactersWithIdMovieSpecific = await _unitOfWork.Repository<Character>().ListAsync(spec);
 
-                if (charactersWithIdMovieSpecific.Count>0)
+                if (charactersWithIdMovieSpecific.Count > 0)
                 {
                     return _mapper.Map<List<Character>, List<CharacterDto>>(charactersWithIdMovieSpecific.ToList());
                 }
@@ -185,5 +185,7 @@ namespace ApiDisney.Controllers
 
             return BadRequest(new ApiResponse(400, "El identificador de pelicula no puede ser negativo"));
         }
+
+       
     }
 }

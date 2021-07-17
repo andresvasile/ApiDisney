@@ -9,12 +9,15 @@ namespace ApiDisney.Helpers
         public MappingProfile()
         {
             CreateMap<Character, CharacterDto>().ReverseMap();
-            CreateMap<Movie, MovieDto>();
+            CreateMap<Movie, MovieDto>()
+                .ForMember(x=>x.GenreName,o=>o.MapFrom(s=>s.Genre.Name)).ReverseMap();
             CreateMap<Genre, GenreDto>();
             CreateMap<CharacterMovie, CharacterMovieDto>()
-                .ForMember(x=>x.Character,o=>o.MapFrom(s=>s.Character))
-                .ForMember(x => x.Movie, o => o.MapFrom(s => s.Movie));
-
+                .ForMember(x => x.CharacterName, o => o.MapFrom(s => s.Character.Name))
+                //.ForMember(x => x.MovieName, o => o.MapFrom(s => s.Movie.Title))
+                ;
+            CreateMap<Character, CharacterSpecificDto>();
+            CreateMap<Movie, MovieSpecificDto>();
         }
     }
 }

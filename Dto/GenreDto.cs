@@ -7,6 +7,6 @@ namespace ApiDisney.Dto
         public int Id_Genre { get; set; }
         public string Name { get; set; }
         public string Image { get; set; }
-        public ICollection<MovieDto> Movies { get; set; }
+        public  ICollection<MovieDto> Movies { get; set; }
     }
 }

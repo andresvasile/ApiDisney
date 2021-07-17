@@ -30,6 +30,9 @@ namespace ApiDisney.Data
                 .HasOne(x => x.Genre)
                 .WithMany(x => x.Movies)
                 .HasForeignKey(x=>x.Id_Genre);
+            //modelBuilder.Entity<Movie>().Navigation(x => x.CharacterMovies).IsRequired(false);
+            //modelBuilder.Entity<Movie>().Navigation(x => x.Genre).IsRequired(false);
+            //modelBuilder.Entity<Movie>().Property(x => x.Rating).IsRequired(false);
 
             //CharacterMovie
             modelBuilder.Entity<CharacterMovie>().HasKey(cm => new {cm.Id_Movie, cm.Id_Character});

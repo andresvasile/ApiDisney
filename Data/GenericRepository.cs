@@ -1,10 +1,13 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using ApiDisney.Data;
 using ApiDisney.Models;
 using Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using Specifications;
 
 namespace Data
@@ -45,6 +48,7 @@ namespace Data
         private IQueryable<T> ApplySpecification(ISpecification<T> spec)
         {
             return SpecificationEvaluator<T>.GetQuery(_context.Set<T>().AsQueryable(), spec);
+
         }
 
         public void Add(T entity)
@@ -62,5 +66,7 @@ namespace Data
         {
             _context.Set<T>().Remove(entity);
         }
+
+        
     }
 }
