@@ -2,7 +2,11 @@ Para ejecutar el proyecto utilizar el comando en la terminal de visual studio co
 
 dotnet watch run
 
-Fue desarrollado con SqlServer por lo que se debe tener en cuenta a la hora de probar la cadena de conexión,
-en mi caso cree 2 bases de datos de manera local: 
+Fue desarrollado con SqlServer , en mi caso cree 2 bases de datos de manera local: 
 #Disney
 #IdentityDisney
+
+Aspectos a tener en cuenta:
+> El proyecto se debe configurar con su propia key de sendgrid.
+> Modificar las cadenas de conexion para crear las db correspondientes.
+> Se deben cargar los datos en las tablas.
