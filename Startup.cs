@@ -12,10 +12,12 @@ using Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using ApiDisney.EmailService.EmailService.Implement;
 using ApiDisney.Extensions;
 using ApiDisney.Helpers;
 using ApiDisney.Identity;
 using Services;
+using ApiDisney.EmailService.EmailService.Interface;
 
 namespace ApiDisney
 {
@@ -38,6 +40,7 @@ namespace ApiDisney
                 o.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
 
+            services.AddSingleton<ISendGridEnviar, SendGridEnviar>();
             services.AddDbContext<AppIdentityDbContext>(x =>
             {
                 x.UseSqlServer(Configuration.GetConnectionString("IdentityConnection"));

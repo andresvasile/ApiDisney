@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ApiDisney.Dto;
+using ApiDisney.EmailService.EmailService.Interface;
+using ApiDisney.EmailService.EmailService.Model;
 using ApiDisney.Errors;
 using ApiDisney.Extensions;
 using ApiDisney.Identity;
@@ -11,6 +13,7 @@ using AutoMapper;
 using Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 
 namespace ApiDisney.Controllers
 {
@@ -20,12 +23,22 @@ namespace ApiDisney.Controllers
         private readonly SignInManager<AppUser> _signInManager;
         private readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
-        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, ITokenService tokenService, IMapper mapper)
+        private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
+        private readonly ISendGridEnviar _sendGridEnviar;
+
+        public AccountController(UserManager<AppUser> userManager
+            , SignInManager<AppUser> signInManager
+            , ITokenService tokenService
+            , IMapper mapper
+            , IConfiguration configuration
+            , ISendGridEnviar sendGridEnviar)
         {
-            _mapper = mapper;
-            _tokenService = tokenService;
-            _signInManager = signInManager;
             _userManager = userManager;
+            _signInManager = signInManager;
+            _tokenService = tokenService;
+            _mapper = mapper;
+            _configuration = configuration;
+            _sendGridEnviar = sendGridEnviar;
         }
 
         [Authorize]
@@ -87,12 +100,30 @@ namespace ApiDisney.Controllers
 
             if (!result.Succeeded) return BadRequest(new ApiResponse(400));
 
-            return new UserDto
+            var objData = new SendGridData();
+            objData.Contenido = "Esta es la descripcion";
+            objData.NombreDestinatario = user.DisplayName;
+            objData.Titulo = "Bienvenido a la pagina de disney";
+            objData.EmailDestinatario =user.Email;
+            objData.SendGridAPIKey = _configuration["SendGrid:ApiKey"];
+
+            var resultado = await _sendGridEnviar.EnviarEMail(objData);
+
+            if (resultado.resultado)
             {
-                DisplayName = user.DisplayName,
-                Token = _tokenService.CreateToken(user),
-                Email = user.Email
-            };
+                await Task.CompletedTask;
+                return new UserDto
+                {
+                    DisplayName = user.DisplayName,
+                    Token = _tokenService.CreateToken(user),
+                    Email = user.Email
+                };
+
+            }
+            else
+            {
+                return BadRequest(new ApiResponse(400,resultado.errorMessage));
+            }
         }
     }
 }

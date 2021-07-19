@@ -27,7 +27,6 @@ namespace ApiDisney.Controllers
         {
 
             var movies = await _unitOfWork.Repository<Movie>().ListAllAsync();
-
             return _mapper.Map<List<Movie>, List<MovieSpecificDto>>(movies.ToList());
         }
 
